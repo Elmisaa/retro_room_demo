@@ -1,0 +1,216 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
+[ext_resource type="Texture2D" path="res://assets/background.png" id="2_bg"]
+[ext_resource type="Shader" path="res://shaders/retro_post.gdshader" id="4_post"]
+[ext_resource type="Script" path="res://scripts/hotspot.gd" id="5_hot"]
+[ext_resource type="Script" path="res://scripts/dust.gd" id="6_dust"]
+
+[sub_resource type="Gradient" id="Gradient_dust"]
+offsets = PackedFloat32Array(0, 0.25, 0.75, 1)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_add"]
+blend_mode = 1
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_post"]
+shader = ExtResource("4_post")
+shader_parameter/pixel_res = Vector2(320, 240)
+shader_parameter/sharpen = 0.3
+shader_parameter/pixel_grid = 0.0
+shader_parameter/color_levels = 12.0
+shader_parameter/dither_strength = 1.0
+shader_parameter/shadow_tint = Color(0.03, 0.09, 0.07, 1)
+shader_parameter/highlight_tint = Color(0.9, 1, 0.95, 1)
+shader_parameter/tint_amount = 0.6
+shader_parameter/saturation = 0.85
+shader_parameter/contrast = 1.1
+shader_parameter/vignette_strength = 0.6
+shader_parameter/grain_amount = 0.03
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_main")
+
+[node name="Background" type="Sprite2D" parent="."]
+texture = ExtResource("2_bg")
+centered = false
+
+[node name="Dust" type="Node2D" parent="."]
+
+[node name="AirDust" type="CPUParticles2D" parent="Dust"]
+material = SubResource("CanvasItemMaterial_add")
+position = Vector2(480, 360)
+amount = 90
+lifetime = 8.0
+preprocess = 8.0
+randomness = 1.0
+lifetime_randomness = 0.5
+emission_shape = 3
+emission_rect_extents = Vector2(480, 360)
+spread = 180.0
+gravity = Vector2(0, 0)
+initial_velocity_min = 2.0
+initial_velocity_max = 8.0
+damping_min = 3.0
+damping_max = 6.0
+scale_amount_min = 2.0
+scale_amount_max = 3.0
+color = Color(0.9, 1, 0.95, 0.25)
+color_ramp = SubResource("Gradient_dust")
+script = ExtResource("6_dust")
+drift_strength = 5.0
+
+[node name="LampDust" type="CPUParticles2D" parent="Dust"]
+material = SubResource("CanvasItemMaterial_add")
+position = Vector2(150, 390)
+amount = 50
+lifetime = 8.0
+preprocess = 8.0
+randomness = 1.0
+lifetime_randomness = 0.5
+emission_shape = 3
+emission_rect_extents = Vector2(110, 140)
+spread = 180.0
+gravity = Vector2(0, 0)
+initial_velocity_min = 2.0
+initial_velocity_max = 8.0
+damping_min = 3.0
+damping_max = 6.0
+scale_amount_min = 3.0
+scale_amount_max = 4.5
+color = Color(1, 0.95, 0.8, 0.6)
+color_ramp = SubResource("Gradient_dust")
+script = ExtResource("6_dust")
+drift_strength = 4.0
+
+[node name="CeilingDust" type="CPUParticles2D" parent="Dust"]
+material = SubResource("CanvasItemMaterial_add")
+position = Vector2(470, 250)
+amount = 60
+lifetime = 8.0
+preprocess = 8.0
+randomness = 1.0
+lifetime_randomness = 0.5
+emission_shape = 3
+emission_rect_extents = Vector2(200, 180)
+spread = 180.0
+gravity = Vector2(0, 0)
+initial_velocity_min = 2.0
+initial_velocity_max = 8.0
+damping_min = 3.0
+damping_max = 6.0
+scale_amount_min = 2.5
+scale_amount_max = 4.0
+color = Color(0.95, 1, 0.95, 0.45)
+color_ramp = SubResource("Gradient_dust")
+script = ExtResource("6_dust")
+drift_strength = 6.0
+
+[node name="PostFX" type="CanvasLayer" parent="."]
+layer = 1
+
+[node name="Effect" type="ColorRect" parent="PostFX"]
+material = SubResource("ShaderMaterial_post")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="UI" type="CanvasLayer" parent="."]
+layer = 2
+
+[node name="Hotspots" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Lamp" type="Control" parent="UI/Hotspots"]
+layout_mode = 0
+offset_left = 136.0
+offset_top = 337.0
+offset_right = 164.0
+offset_bottom = 365.0
+script = ExtResource("5_hot")
+icon = "look"
+text = "Настольная лампа. Свет тёплый, но комнату не согревает."
+
+[node name="Curtain" type="Control" parent="UI/Hotspots"]
+layout_mode = 0
+offset_left = 234.0
+offset_top = 284.0
+offset_right = 262.0
+offset_bottom = 312.0
+script = ExtResource("5_hot")
+icon = "look"
+text = "Тяжёлые шторы. Не помню, что за ними."
+
+[node name="Door" type="Control" parent="UI/Hotspots"]
+layout_mode = 0
+offset_left = 485.0
+offset_top = 297.0
+offset_right = 525.0
+offset_bottom = 325.0
+script = ExtResource("5_hot")
+icon = "eye"
+text = "Дверь закрыта. Изнутри."
+
+[node name="Painting" type="Control" parent="UI/Hotspots"]
+layout_mode = 0
+offset_left = 800.0
+offset_top = 252.0
+offset_right = 840.0
+offset_bottom = 280.0
+script = ExtResource("5_hot")
+icon = "eye"
+text = "Картина. Зелёное небо над холмом."
+
+[node name="Sofa" type="Control" parent="UI/Hotspots"]
+layout_mode = 0
+offset_left = 757.0
+offset_top = 506.0
+offset_right = 785.0
+offset_bottom = 534.0
+script = ExtResource("5_hot")
+icon = "look"
+text = "Диван. Кажется, на нём никто никогда не сидел."
+
+[node name="Subtitle" type="ColorRect" parent="UI"]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -400.0
+offset_top = -92.0
+offset_right = 400.0
+offset_bottom = -52.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+color = Color(0, 0, 0, 0.75)
+
+[node name="Text" type="Label" parent="UI/Subtitle"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 18
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Help" type="Label" parent="UI"]
+offset_left = 12.0
+offset_top = 10.0
+offset_right = 400.0
+offset_bottom = 280.0
+theme_override_colors/font_color = Color(1, 1, 1, 0.9)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 16
