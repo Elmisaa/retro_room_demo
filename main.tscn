@@ -5,13 +5,26 @@
 [ext_resource type="Shader" path="res://shaders/retro_post.gdshader" id="4_post"]
 [ext_resource type="Script" path="res://scripts/hotspot.gd" id="5_hot"]
 [ext_resource type="Script" path="res://scripts/dust.gd" id="6_dust"]
+[ext_resource type="Script" path="res://scripts/light_flicker.gd" id="7_flicker"]
 
 [sub_resource type="Gradient" id="Gradient_dust"]
-offsets = PackedFloat32Array(0, 0.25, 0.75, 1)
-colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0)
+offsets = PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.42, 0.52, 0.62, 0.74, 0.86, 1)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0.9, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0.2, 1, 1, 1, 0)
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_add"]
 blend_mode = 1
+
+[sub_resource type="Gradient" id="Gradient_light"]
+offsets = PackedFloat32Array(0, 0.35, 1)
+colors = PackedColorArray(1, 1, 1, 1, 0.35, 0.35, 0.35, 1, 0, 0, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_light"]
+gradient = SubResource("Gradient_light")
+width = 256
+height = 256
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_post"]
 shader = ExtResource("4_post")
@@ -26,7 +39,9 @@ shader_parameter/tint_amount = 0.6
 shader_parameter/saturation = 0.85
 shader_parameter/contrast = 1.1
 shader_parameter/vignette_strength = 0.6
-shader_parameter/grain_amount = 0.03
+shader_parameter/grain_amount = 0.0
+shader_parameter/bloom_strength = 0.3
+shader_parameter/bloom_threshold = 0.7
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_main")
@@ -34,6 +49,39 @@ script = ExtResource("1_main")
 [node name="Background" type="Sprite2D" parent="."]
 texture = ExtResource("2_bg")
 centered = false
+
+[node name="Lights" type="Node2D" parent="."]
+
+[node name="LampLight" type="PointLight2D" parent="Lights"]
+position = Vector2(152, 360)
+color = Color(1, 0.84, 0.6, 1)
+energy = 0.7
+texture = SubResource("GradientTexture2D_light")
+texture_scale = 2.2
+script = ExtResource("7_flicker")
+flicker = 0.05
+flicker_speed = 0.8
+
+[node name="CeilingLight" type="PointLight2D" parent="Lights"]
+position = Vector2(470, 70)
+color = Color(0.85, 1, 0.95, 1)
+energy = 0.4
+texture = SubResource("GradientTexture2D_light")
+texture_scale = 3.0
+script = ExtResource("7_flicker")
+flicker = 0.03
+flicker_speed = 3.0
+blink_chance = 0.15
+
+[node name="PaintingGlow" type="PointLight2D" parent="Lights"]
+position = Vector2(822, 262)
+color = Color(0.4, 1, 0.6, 1)
+energy = 0.18
+texture = SubResource("GradientTexture2D_light")
+texture_scale = 1.0
+script = ExtResource("7_flicker")
+flicker = 0.15
+flicker_speed = 0.4
 
 [node name="Dust" type="Node2D" parent="."]
 

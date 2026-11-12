@@ -16,6 +16,7 @@ const TINT_PRESETS := [
 @onready var subtitle_text: Label = $UI/Subtitle/Text
 @onready var help: Label = $UI/Help
 @onready var dust: Node2D = $Dust
+@onready var lights: Node2D = $Lights
 
 var mat: ShaderMaterial
 var pixel_idx := 3
@@ -84,6 +85,12 @@ func _unhandled_input(event: InputEvent) -> void:
 			_add_param("sharpen", 0.1, 0.0, 2.0)
 		KEY_D:
 			dust.visible = not dust.visible
+		KEY_L:
+			lights.visible = not lights.visible
+		KEY_Z:
+			_add_param("bloom_strength", -0.1, 0.0, 2.0)
+		KEY_X:
+			_add_param("bloom_strength", 0.1, 0.0, 2.0)
 		KEY_H:
 			help.visible = not help.visible
 		_:
@@ -109,5 +116,7 @@ func _update_help() -> void:
 		"Q/W  — сетка пикселей: %.1f" % mat.get_shader_parameter("pixel_grid"),
 		"A/S  — резкость: %.1f" % mat.get_shader_parameter("sharpen"),
 		"D    — пыль: %s" % ("ВКЛ" if dust.visible else "выкл"),
+		"L    — свет: %s" % ("ВКЛ" if lights.visible else "выкл"),
+		"Z/X  — свечение: %.1f" % mat.get_shader_parameter("bloom_strength"),
 		"H    — скрыть подсказку",
 	])

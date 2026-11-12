@@ -23,8 +23,14 @@ uniform float tint_amount : hint_range(0.0, 1.0) = 0.7;
 uniform float saturation : hint_range(0.0, 2.0) = 0.85;
 uniform float contrast : hint_range(0.5, 2.0) = 1.1;
 
+// Свечение (bloom): яркие места «расплываются» мягким ореолом.
+uniform float bloom_strength : hint_range(0.0, 2.0) = 0.3;
+uniform float bloom_threshold : hint_range(0.0, 1.0) = 0.7;
+// Радиус ореола в «больших» пикселях.
+uniform float bloom_radius : hint_range(1.0, 8.0) = 3.0;
+
 uniform float vignette_strength : hint_range(0.0, 2.0) = 0.6;
-uniform float grain_amount : hint_range(0.0, 0.2) = 0.03;
+uniform float grain_amount : hint_range(0.0, 0.2) = 0.0;
 
 const float BAYER4[16] = float[16](
 	 0.0,  8.0,  2.0, 10.0,
@@ -50,6 +56,18 @@ void fragment() {
 	vec3 n = sample_px(px + vec2(1.0, 0.0)) + sample_px(px - vec2(1.0, 0.0))
 	       + sample_px(px + vec2(0.0, 1.0)) + sample_px(px - vec2(0.0, 1.0));
 	c += (c - n * 0.25) * sharpen;
+
+	// 2b. Свечение: собираем яркость с двух колец вокруг пикселя.
+	vec3 glow = vec3(0.0);
+	for (int i = 0; i < 12; i++) {
+		float a = float(i) * TAU / 12.0;
+		vec2 dir = vec2(cos(a), sin(a));
+		vec3 s1 = sample_px(floor(px + dir * bloom_radius));
+		vec3 s2 = sample_px(floor(px + dir * bloom_radius * 2.0 + 0.5));
+		glow += max(s1 - bloom_threshold, 0.0) + max(s2 - bloom_threshold, 0.0) * 0.6;
+	}
+	glow /= 12.0 * 1.6 * max(1.0 - bloom_threshold, 0.05);
+	c += glow * bloom_strength;
 
 	// 3. Насыщенность и контраст.
 	float l = dot(c, vec3(0.299, 0.587, 0.114));
