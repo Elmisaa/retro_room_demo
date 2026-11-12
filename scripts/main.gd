@@ -119,4 +119,5 @@ func _update_help() -> void:
 		"L    — свет: %s" % ("ВКЛ" if lights.visible else "выкл"),
 		"Z/X  — свечение: %.1f" % mat.get_shader_parameter("bloom_strength"),
 		"H    — скрыть подсказку",
+		"Esc  — меню",
 	])
